@@ -5,14 +5,25 @@ socket.on( 'connect', () => {
 } );
 socket.on( 'disconnect', () => console.log( 'Disconnected from server' ) );
 socket.on( 'newMessage', function ( message ) {
-	console.log( 'New message', message );
+	const formattedTime = moment( message.createdAt ).format( 'h:mm a' );
 
 	const li = jQuery( '<li></li>' );
 
-	li.text( `${ message.from }: ${ message.text }` );
+	li.text( `${ message.from } ${ formattedTime }: ${ message.text }` );
 	$( '#messages' ).append( li );
 } );
-$( '#message-form' ).on( 'submit', function ( e ) {
+socket.on( 'newLocationMessage', message => {
+	const formattedTIme = moment( message.createdAt ).format( 'h:mm a' );
+	const $li = $( '<li></li>' );
+	const $a = $( '<a target="_blank">My current location</a>' );
+
+	$li.text( `${ message.from } ${ formattedTIme }: ` );
+	$a.attr( 'href', message.url );
+	$li.append( $a );
+	$( '#messages' ).append( $li );
+} );
+
+$( '0#message-form' ).on( 'submit', function ( e ) {
 	e.preventDefault();
 
 
@@ -24,15 +35,6 @@ $( '#message-form' ).on( 'submit', function ( e ) {
 		}, function () {
 			$messageTextBox.val( '' );
 		} );
-} );
-socket.on( 'newLocationMessage', message => {
-	const $li = $( '<li></li>' );
-	const $a = $( '<a target="_blank">My current location</a>' );
-
-	$li.text( `${ message.from }: ` );
-	$a.attr( 'href', message.url );
-	$li.append( $a );
-	$( '#messages' ).append( $li );
 } );
 
 const $locationButton = $( '#send-location' );
