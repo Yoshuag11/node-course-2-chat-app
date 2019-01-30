@@ -14,15 +14,11 @@ app.use( express.static( publicPath ) );
 io.on( 'connection', socket => {
 	console.log( 'New user connected' );
 	socket.on( 'disconnect', () => console.log( 'User was disconnected' ) );
-	socket.on( 'createMessage', message => {
+	socket.on( 'createMessage', ( message, callback ) => {
 		console.log( 'createMessage', message );
 
 		io.emit( 'newMessage', generateMessage( message.from, message.text ) );
-		// socket.broadcast.emit( 'newMessage', {
-		// 	from: message.from,
-		// 	text: message.text,
-		// 	createdAt: new Date().getTime()
-		// } );
+		callback( 'This is from the server' );
 	} );
 	socket.emit(
 		'newMessage', generateMessage( 'Admin', 'Welcome to the chat app' ) );
