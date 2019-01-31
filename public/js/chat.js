@@ -16,7 +16,16 @@ function scrollToBottom () {
 }
 
 socket.on( 'connect', () => {
-	console.log( 'Connected to the server' );
+	const params = $.deparam( window.location.search );
+
+	socket.emit( 'join', params, ( err ) => {
+		if ( err ) {
+			alert( err );
+			window.location.href = '/';
+		} else {
+			console.log( 'No error' );
+		}
+	} );
 } );
 socket.on( 'disconnect', () => console.log( 'Disconnected from server' ) );
 socket.on( 'newMessage', function ( message ) {
@@ -47,10 +56,16 @@ socket.on( 'newLocationMessage', message => {
 
 	scrollToBottom();
 } );
+socket.on( 'updateUserList', users => {
+	const ol = $( '<ol></ol>' );
+
+	users.forEach( user => ol.append( $( '<li></li>' ).text( user ) ) );
+
+	$( '#users' ).html( ol );
+} );
 
 $( '#message-form' ).on( 'submit', function ( e ) {
 	e.preventDefault();
-
 
 	const $messageTextBox = $( '[name=message]' );
 
